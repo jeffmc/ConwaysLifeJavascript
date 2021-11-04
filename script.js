@@ -9,26 +9,23 @@ function GameOfLife() {
     (this.fieldWidth = 25), (this.fieldHeight = 25); // TODO: Fix canvas aspect ratio for square cells.
 
     this.infoParagraph = document.getElementById("info");
-    this.infoParagraph.innerHTML = `<b>${this.fieldWidth}x${this.fieldHeight}</b> - ${new Date().toDateString()}`;
+    this.infoParagraph.innerHTML = `<b>${this.fieldWidth}x${
+      this.fieldHeight
+    }</b> - ${new Date().toDateString()}`;
 
     //determine cell dimensions
     this.cellWidth = Math.floor(this.canvasWidth / this.fieldWidth); // use floor() because float math can leave gaps between
     this.cellHeight = Math.floor(this.canvasHeight / this.fieldHeight);
 
-    this.textSize = Math.floor(this.cellHeight * 0.7);
-
-    this.gfx.textBaseline = "middle";
-    this.gfx.textAlign = "center";
-    this.gfx.font = `bold ${this.textSize}px sans-serif`;
-
-    this.gameOver = false;
-    this.wonGame = false;
+    // this.textSize = Math.floor(this.cellHeight * 0.7);
+    // this.gfx.textBaseline = "middle";
+    // this.gfx.textAlign = "center";
+    // this.gfx.font = `bold ${this.textSize}px sans-serif`;
 
     // clear background
     this.gfx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
-    this.generateField(); // gen field
-
-    this.game = this;
+    this.generateField(); // generate blank field
+    this.drawField();
   };
 
   this.generateField = function () {
@@ -38,20 +35,11 @@ function GameOfLife() {
     let x, y; // x and y coordinates for the below for loop.
     for (let i = 0; i < totalSize; i++) {
       this.field[i] = false;
-      x = i % this.fieldWidth;
-      y = Math.floor(i / this.fieldWidth);
-      this.gfx.fillStyle = (x + (y % 2)) % 2 == 0 ? "#555555" : "#666666";
-      this.gfx.fillRect(
-        x * this.cellWidth,
-        y * this.cellHeight,
-        this.cellWidth,
-        this.cellHeight
-      );
     }
   };
 
-  this.stepCell = function (x,y) {
-    let idx = this.getFieldIDX(x,y);
+  this.stepCell = function (x, y) {
+    let idx = this.getFieldIDX(x, y);
     let xp = x < this.fieldWidth - 1,
       xn = x > 0; // x +/- available
     let yp = y < this.fieldHeight - 1,
@@ -84,27 +72,25 @@ function GameOfLife() {
     return Math.floor(idx / this.fieldWidth);
   };
 
-  this.drawCell = function (x, y, status) {
-    this.gfx.fillStyle = (x + (y % 2)) % 2 == 0 ? "#555555" : "#666666";
+  this.drawCell = function (x, y, state) {
+    this.gfx.fillStyle = state ? "#000055" : "#000000";
     this.gfx.fillRect(
       x * this.cellWidth,
       y * this.cellHeight,
       this.cellWidth,
       this.cellHeight
     );
-    if (status) {
-      this.gfx.fillStyle = "#00CC00";
-      this.gfx.fillRect(
-        x * this.cellWidth + this.flagGap,
-        y * this.cellHeight + this.flagGap,
-        this.cellWidth - this.flagGap * 2,
-        this.cellHeight - this.flagGap * 2
-      );
+  };
+  this.drawField = function () {
+    for (let y = 0; y < this.fieldHeight; y++) {
+      for (let x = 0; x < this.fieldWidth; x++) {
+        this.drawCell(x,y,this.field[y * this.fieldWidth + x]);
+      }
     }
   };
   this.step = function () {
     let nextField = [];
-  }
+  };
 }
 let container = {};
 container.gameOfLife = new GameOfLife();
