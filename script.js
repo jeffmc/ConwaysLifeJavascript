@@ -30,7 +30,7 @@ function GameOfLife() {
     this.drawField();
   };
 
-  this.generateField = function () {
+  this.generateField = function () { // TODO: Make multiple different field generators, give user with prompt to pick from.
     // width, height, and number of mines
     let newField = [];
     let totalSize = this.fieldWidth * this.fieldHeight;
@@ -164,8 +164,8 @@ function canvasClick(e) {
 tickit = tickit.bind(container);
 canvasClick = canvasClick.bind(container);
 function start() {
-  container.gameOfLife.setup();
-  setInterval(tickit, 50);
+  container.gameOfLife.setup(); // TODO: Add clear, regenerate, and new any other tools to manually manipulate field.
+  setInterval(tickit, 50); // TODO: Better control loop, add pause/play
 }
 window.addEventListener("load", start);
 document.querySelector("#step").addEventListener("click", tickit);
