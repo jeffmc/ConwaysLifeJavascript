@@ -6,7 +6,7 @@ function GameOfLife() {
     this.canvas = document.getElementById("game");
     (this.canvasWidth = 600), (this.canvasHeight = 600); // TODO: Fix this.
     this.gfx = this.canvas.getContext("2d");
-    (this.fieldWidth = 50), (this.fieldHeight = 50); // TODO: Fix canvas aspect ratio for square cells.
+    (this.fieldWidth = 100), (this.fieldHeight = 100); // TODO: Fix canvas aspect ratio for square cells.
 
     this.infoParagraph = document.getElementById("info");
     this.infoParagraph.innerHTML = `<b>${this.fieldWidth}x${
@@ -22,6 +22,8 @@ function GameOfLife() {
     // this.gfx.textAlign = "center";
     // this.gfx.font = `bold ${this.textSize}px sans-serif`;
 
+    this.drawGridLines = false;
+
     // clear background
     this.gfx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
     this.field = this.generateField(); // generate blank field
@@ -34,7 +36,7 @@ function GameOfLife() {
     let totalSize = this.fieldWidth * this.fieldHeight;
     let x, y; // x and y coordinates for the below for loop.
     for (let i = 0; i < totalSize; i++) {
-      newField[i] = false;
+      newField[i] = Math.random() < 0.1;
     }
     return newField;
   };
@@ -115,24 +117,41 @@ function GameOfLife() {
         this.drawCell(x, y, this.field[y * this.fieldWidth + x]);
       }
     }
+    if (this.drawGridLines) {
+      this.gfx.lineWidth = 0.5;
+      this.gfx.strokeStyle = "#ffffff";
+      this.gfx.setTransform(1, 0, 0, 1, 0.5, 0.5); // https://stackoverflow.com/questions/7530593/html5-canvas-and-line-width/7531540#7531540 To get pixel-perfect lines.
+      this.gfx.beginPath();
+      for (let i = 1; i < this.fieldWidth; i++) {
+        this.gfx.moveTo(i * this.cellWidth, 0);
+        this.gfx.lineTo(i * this.cellWidth, this.canvasHeight);
+        this.gfx.moveTo(0, i * this.cellWidth);
+        this.gfx.lineTo(this.canvasWidth, i * this.cellWidth);
+      }
+      this.gfx.closePath();
+      this.gfx.stroke();
+    }
+    this.gfx.setTransform(1, 0, 0, 1, 0, 0);
   };
   this.update = function () {
     this.stepField();
+
+    this.gfx.fillStyle = "#000000";
+    this.gfx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
     this.drawField();
   };
   this.userToggleCell = function (x, y) {
     // Should only be called in response to user input.
     let idx = this.getFieldIDX(x, y);
     this.field[idx] = !this.field[idx];
-    this.drawCell(x,y,this.field[idx]);
   };
-  this.clicked = function(e) {
+  this.clicked = function (e) {
     let cellX = Math.floor(e.offsetX / this.cellWidth);
     let cellY = Math.floor(e.offsetY / this.cellHeight);
-    this.userToggleCell(cellX,cellY);
-  }
+    this.userToggleCell(cellX, cellY);
+    this.drawField();
+  };
 }
-
 
 let container = {};
 container.gameOfLife = new GameOfLife();
@@ -146,7 +165,7 @@ tickit = tickit.bind(container);
 canvasClick = canvasClick.bind(container);
 function start() {
   container.gameOfLife.setup();
-  // setInterval(tickit.bind(container), 50);
+  setInterval(tickit, 50);
 }
 window.addEventListener("load", start);
 document.querySelector("#step").addEventListener("click", tickit);
